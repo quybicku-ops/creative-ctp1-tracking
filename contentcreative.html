@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌟 Creative Task Manager</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;800&display=swap" rel="stylesheet">
+    
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+    <style>
+        :root {
+            --primary: #FFB7B2; /* Pastel Pink */
+            --secondary: #E2F0CB; /* Pastel Green */
+            --accent: #B5EAD7; /* Pastel Mint */
+            --bg: #F9F9FB;
+            --text: #4A4A4A;
+            --border: #E0E0E0;
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            margin: 0;
+            color: #FF8BA7;
+            font-size: 28px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .stats {
+            background: var(--secondary);
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-weight: 600;
+            color: #558B2F;
+        }
+
+        /* Nút bấm */
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 12px;
+            font-family: inherit;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            font-size: 16px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 183, 178, 0.4);
+        }
+
+        .btn-delete {
+            background: #FF9AA2;
+            padding: 6px 12px;
+            font-size: 13px;
+            border-radius: 8px;
+        }
+
+        /* Bảng */
+        .table-wrapper {
+            overflow-x: auto;
+            border-radius: 15px;
+            border: 1px solid var(--border);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            background-color: #FFF0F5;
+            color: #D81B60;
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover {
+            background-color: #FAFAFA;
+        }
+
+        /* Form Inputs bên trong bảng */
+        input[type="text"], input[type="date"], select {
+            width: 100%;
+            border: 1px solid transparent;
+            background: transparent;
+            font-family: 'Nunito', sans-serif;
+            font-size: 15px;
+            color: var(--text);
+            padding: 8px;
+            border-radius: 8px;
+            transition: all 0.2s;
+            box-sizing: border-box;
+        }
+
+        input[type="text"]:hover, input[type="date"]:hover, select:hover {
+            background: #F0F0F0;
+        }
+
+        input[type="text"]:focus, input[type="date"]:focus, select:focus {
+            outline: none;
+            border: 1px solid var(--primary);
+            background: white;
+            box-shadow: 0 0 0 3px rgba(255, 183, 178, 0.2);
+        }
+
+        /* Checkbox dễ thương */
+        input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            accent-color: var(--primary);
+            cursor: pointer;
+        }
+
+        .col-stt { width: 50px; text-align: center; }
+        .col-action { width: 80px; text-align: center; }
+
+        /* Loader */
+        #loader {
+            text-align: center;
+            padding: 50px;
+            font-size: 18px;
+            color: var(--primary);
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>✨ Boardgame Creative Tasks</h1>
+        <div class="stats" id="statsDisplay">Đang tải dữ liệu...</div>
+        <button class="btn" onclick="addNewTask()">➕ Thêm Task Mới</button>
+    </div>
+
+    <div id="loader">Đang kết nối Firebase... 🚀</div>
+
+    <div class="table-wrapper" id="tableContainer" style="display: none;">
+        <table>
+            <thead>
+                <tr>
+                    <th class="col-stt">STT</th>
+                    <th>🏷️ Pillar/Type</th>
+                    <th>📝 Tên Concept</th>
+                    <th>🔗 Link Thành Phẩm</th>
+                    <th style="text-align: center;">✅ Ready?</th>
+                    <th>🎨 Format</th>
+                    <th>🧑‍💻 PIC</th>
+                    <th>📅 Deadline</th>
+                    <th class="col-action">🗑️ Xóa</th>
+                </tr>
+            </thead>
+            <tbody id="taskTableBody">
+                </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    // 1. Cấu hình Firebase bằng databaseURL của bạn
+    const firebaseConfig = {
+        databaseURL: "https://creatives-ctp1-default-rtdb.firebaseio.com/"
+    };
+
+    // Khởi tạo Firebase
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+    const tasksRef = db.ref('tasks');
+
+    const tableBody = document.getElementById('taskTableBody');
+    const loader = document.getElementById('loader');
+    const tableContainer = document.getElementById('tableContainer');
+    const statsDisplay = document.getElementById('statsDisplay');
+
+    // 2. Lắng nghe dữ liệu Realtime
+    tasksRef.on('value', (snapshot) => {
+        const data = snapshot.val();
+        renderTable(data);
+    });
+
+    // 3. Hàm Render Bảng
+    function renderTable(data) {
+        tableBody.innerHTML = ''; // Xóa dữ liệu cũ
+        loader.style.display = 'none';
+        tableContainer.style.display = 'block';
+
+        if (!data) {
+            statsDisplay.innerText = "Chưa có task nào! 🥺";
+            return;
+        }
+
+        let stt = 1;
+        let readyCount = 0;
+        let totalCount = 0;
+
+        for (const [id, task] of Object.entries(data)) {
+            totalCount++;
+            if (task.ready) readyCount++;
+
+            const tr = document.createElement('tr');
+            
+            tr.innerHTML = `
+                <td class="col-stt"><strong>${stt}</strong></td>
+                
+                <td>
+                    <select onchange="updateTask('${id}', 'pillar', this.value)">
+                        <option value="Research" ${task.pillar === 'Research' ? 'selected' : ''}>Research</option>
+                        <option value="AI Gen" ${task.pillar === 'AI Gen' ? 'selected' : ''}>AI Gen</option>
+                        <option value="Branding" ${task.pillar === 'Branding' ? 'selected' : ''}>Branding</option>
+                        <option value="Design" ${task.pillar === 'Design' ? 'selected' : ''}>Design</option>
+                        <option value="Social" ${task.pillar === 'Social' ? 'selected' : ''}>Social</option>
+                        <option value="Production" ${task.pillar === 'Production' ? 'selected' : ''}>Production</option>
+                        <option value="Animation" ${task.pillar === 'Animation' ? 'selected' : ''}>Animation</option>
+                        <option value="Anime" ${task.pillar === 'Anime' ? 'selected' : ''}>Anime</option>
+                        <option value="Khác" ${!task.pillar || task.pillar === 'Khác' ? 'selected' : ''}>Khác</option>
+                    </select>
+                </td>
+
+                <td>
+                    <input type="text" value="${task.concept || ''}" placeholder="Nhập tên concept..." 
+                           onblur="updateTask('${id}', 'concept', this.value)">
+                </td>
+
+                <td>
+                    <input type="text" value="${task.link || ''}" placeholder="Dán link vào đây..." 
+                           onblur="updateTask('${id}', 'link', this.value)">
+                </td>
+
+                <td style="text-align: center;">
+                    <input type="checkbox" ${task.ready ? 'checked' : ''} 
+                           onchange="updateTask('${id}', 'ready', this.checked)">
+                </td>
+
+                <td>
+                    <select onchange="updateTask('${id}', 'format', this.value)">
+                        <option value="Banner" ${task.format === 'Banner' ? 'selected' : ''}>Banner</option>
+                        <option value="Video" ${task.format === 'Video' ? 'selected' : ''}>Video</option>
+                        <option value="Image" ${task.format === 'Image' ? 'selected' : ''}>Image</option>
+                        <option value="Chưa rõ" ${!task.format || task.format === 'Chưa rõ' ? 'selected' : ''}>Chưa rõ</option>
+                    </select>
+                </td>
+
+                <td>
+                    <select onchange="updateTask('${id}', 'pic', this.value)">
+                        <option value="Bảo" ${task.pic === 'Bảo' ? 'selected' : ''}>Bảo</option>
+                        <option value="Lam" ${task.pic === 'Lam' ? 'selected' : ''}>Lam</option>
+                        <option value="Cả hai" ${task.pic === 'Cả hai' ? 'selected' : ''}>Cả hai</option>
+                        <option value="" ${!task.pic ? 'selected' : ''}>-- Chọn --</option>
+                    </select>
+                </td>
+
+                <td>
+                    <input type="date" value="${task.deadline || ''}" 
+                           onchange="updateTask('${id}', 'deadline', this.value)">
+                </td>
+
+                <td class="col-action">
+                    <button class="btn btn-delete" onclick="deleteTask('${id}')">Xóa</button>
+                </td>
+            `;
+            tableBody.appendChild(tr);
+            stt++;
+        }
+
+        // Cập nhật thống kê
+        statsDisplay.innerHTML = `Hoàn thành: ${readyCount} / ${totalCount} 🚀`;
+    }
+
+    // 4. Các hàm thao tác với DB
+    function updateTask(id, field, value) {
+        db.ref('tasks/' + id).update({
+            [field]: value
+        });
+    }
+
+    function addNewTask() {
+        tasksRef.push({
+            pillar: "Khác",
+            concept: "",
+            link: "",
+            ready: false,
+            format: "Chưa rõ",
+            pic: "",
+            deadline: ""
+        });
+    }
+
+    function deleteTask(id) {
+        if (confirm("Bạn có chắc chắn muốn xóa task này không? 🥺")) {
+            db.ref('tasks/' + id).remove();
+        }
+    }
+</script>
+
+</body>
+</html>
