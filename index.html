@@ -137,6 +137,15 @@
         }
         th:hover { filter: brightness(0.95); }
         
+        /* CSS kéo thả (Drag & Drop) */
+        tr[draggable="true"] { cursor: grab; }
+        tr[draggable="true"]:active { cursor: grabbing; }
+        tr.drag-over td {
+            border-top: 2px dashed var(--primary) !important;
+            background-color: rgba(255, 255, 255, 0.4) !important;
+        }
+        tr.dragging { opacity: 0.5; background-color: var(--primary) !important; }
+
         /* Cột Resizer JS */
         .resizer {
             width: 5px; height: 100%; position: absolute; right: 0; top: 0;
@@ -193,11 +202,42 @@
         .opt-row { display: flex; gap: 10px; margin-bottom: 10px; }
         .opt-row input { flex-grow: 1; border: 1px solid var(--border); }
         .modal h2 { margin-top: 0; color: var(--primary); }
+
+        /* TOAST NOTIFICATION */
+        #toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            pointer-events: none;
+        }
+        .toast {
+            background: var(--container-bg);
+            color: var(--text);
+            border-left: 5px solid var(--primary);
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            font-weight: bold;
+            transform: translateX(120%);
+            transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), opacity 0.4s ease;
+            opacity: 0;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+        .toast.show {
+            transform: translateX(0);
+            opacity: 1;
+        }
     </style>
 </head>
 <body data-theme="pastel">
 
 <div id="particles"></div>
+<div id="toast-container"></div>
 
 <div class="container">
     <div class="header">
@@ -287,7 +327,8 @@
     let rawTasksData = {};
     let isLocked = false;
     let isShowingHidden = false;
-    let currentSort = { field: null, asc: null }; // Khởi tạo không sort
+    let currentSort = { field: null, asc: null }; 
+    let draggedRowId = null; // Biến lưu dòng đang kéo
     
     let globalOptions = {
         pillar: ["Research", "AI Gen", "Branding", "Design", "Social", "Production", "Animation", "Anime", "Khác"],
@@ -299,6 +340,24 @@
     const loader = document.getElementById('loader');
     const tableContainer = document.getElementById('tableContainer');
     const statsDisplay = document.getElementById('statsDisplay');
+
+    // --- HỆ THỐNG TOAST NOTIFICATION ---
+    function showToast(message) {
+        const container = document.getElementById('toast-container');
+        const toast = document.createElement('div');
+        toast.className = 'toast';
+        toast.innerHTML = message;
+        container.appendChild(toast);
+        
+        // Trigger reflow để animation chạy
+        void toast.offsetWidth;
+        toast.classList.add('show');
+        
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => toast.remove(), 400);
+        }, 4000);
+    }
 
     optionsRef.on('value', (snapshot) => {
         if(snapshot.exists()) globalOptions = snapshot.val();
@@ -331,22 +390,23 @@
         document.getElementById('lockBtn').style.background = isLocked ? "#9E9E9E" : "var(--primary)";
         document.getElementById('addBtn').disabled = isLocked;
         renderTable();
+        showToast(isLocked ? "🔒 Đã khóa Edit an toàn!" : "🔓 Đã mở khóa Edit! (Bạn có thể kéo thả để sắp xếp vị trí)");
     }
 
     function toggleShowHidden() {
         isShowingHidden = !isShowingHidden;
         document.getElementById('showHiddenBtn').innerHTML = isShowingHidden ? "🙈 Đang Hiện Task Đã Xóa" : "👁️ Đang Ẩn Task Đã Xóa";
         renderTable();
+        showToast(isShowingHidden ? "🙈 Đang hiển thị các task đã xóa!" : "👁️ Đã ẩn các task đã xóa!");
     }
 
-    // TÍNH NĂNG TRI-STATE SORT
     function setSort(field) {
         if (currentSort.field === field) {
-            if(currentSort.asc === true) currentSort.asc = false; // Lần 2: Giảm dần
-            else { currentSort.field = null; currentSort.asc = null; } // Lần 3: Bỏ Sort
+            if(currentSort.asc === true) currentSort.asc = false; 
+            else { currentSort.field = null; currentSort.asc = null; } 
         } else {
             currentSort.field = field;
-            currentSort.asc = true; // Lần 1: Tăng dần
+            currentSort.asc = true; 
         }
         
         document.querySelectorAll('.sort-icon').forEach(el => { el.innerText = '↕'; el.classList.remove('active'); });
@@ -358,6 +418,85 @@
             }
         }
         renderTable();
+        showToast(currentSort.field ? `🔄 Đang sắp xếp theo cột đã chọn!` : "🔄 Đã bỏ chế độ sắp xếp, quay về mặc định.");
+    }
+
+    // --- LOGIC KÉO THẢ (DRAG & DROP) ---
+    function handleDragStart(e) {
+        draggedRowId = e.currentTarget.getAttribute('data-id');
+        e.currentTarget.classList.add('dragging');
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/plain', draggedRowId);
+    }
+
+    function handleDragOver(e) {
+        e.preventDefault(); 
+        e.dataTransfer.dropEffect = 'move';
+    }
+
+    function handleDragEnter(e) {
+        e.preventDefault();
+        const tr = e.currentTarget;
+        if (tr && tr.getAttribute('data-id') !== draggedRowId) {
+            tr.classList.add('drag-over');
+        }
+    }
+
+    function handleDragLeave(e) {
+        const tr = e.currentTarget;
+        if (tr && !tr.contains(e.relatedTarget)) {
+            tr.classList.remove('drag-over');
+        }
+    }
+
+    function handleDrop(e) {
+        e.preventDefault();
+        const targetRow = e.currentTarget;
+        targetRow.classList.remove('drag-over');
+        if(!targetRow) return;
+        const targetId = targetRow.getAttribute('data-id');
+        if(draggedRowId === targetId || !draggedRowId) return;
+
+        reorderTasks(draggedRowId, targetId);
+    }
+
+    function handleDragEnd(e) {
+        e.currentTarget.classList.remove('dragging');
+        document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
+    }
+
+    function reorderTasks(draggedId, targetId) {
+        let tasksArray = Object.entries(rawTasksData).map(([id, task]) => ({ id, ...task }));
+        
+        // Sắp xếp theo order mặc định hiện tại
+        tasksArray.sort((a, b) => {
+            let valA = a.order !== undefined ? a.order : (a.createdAt || a.id);
+            let valB = b.order !== undefined ? b.order : (b.createdAt || b.id);
+            if (typeof valA === "number" && typeof valB === "number") return valA - valB;
+            if (valA < valB) return -1;
+            if (valA > valB) return 1;
+            return 0;
+        });
+
+        const draggedIdx = tasksArray.findIndex(t => t.id === draggedId);
+        const targetIdx = tasksArray.findIndex(t => t.id === targetId);
+
+        if(draggedIdx === -1 || targetIdx === -1) return;
+
+        // Cắt task được kéo và chèn vào vị trí mới
+        const [draggedTask] = tasksArray.splice(draggedIdx, 1);
+        tasksArray.splice(targetIdx, 0, draggedTask);
+
+        // Ghi lại order mới cho tất cả các task
+        let updates = {};
+        tasksArray.forEach((task, index) => {
+            updates['tasks/' + task.id + '/order'] = index;
+            rawTasksData[task.id].order = index; // Cập nhật local ngay lập tức
+        });
+
+        db.ref().update(updates);
+        renderTable();
+        showToast("🔄 Đã thay đổi vị trí Task thành công!");
     }
 
     function renderTable() {
@@ -382,6 +521,16 @@
                 if (valA > valB) return currentSort.asc ? 1 : -1;
                 return 0;
             });
+        } else {
+            // Sắp xếp mặc định theo order hoặc thời gian tạo
+            tasksArray.sort((a, b) => {
+                let valA = a.order !== undefined ? a.order : (a.createdAt || a.id);
+                let valB = b.order !== undefined ? b.order : (b.createdAt || b.id);
+                if (typeof valA === "number" && typeof valB === "number") return valA - valB;
+                if (valA < valB) return -1;
+                if (valA > valB) return 1;
+                return 0;
+            });
         }
 
         tableBody.innerHTML = '';
@@ -390,10 +539,24 @@
              return;
         }
 
+        const canDrag = !isLocked && !currentSort.field;
+
         tasksArray.forEach((task, index) => {
             const tr = document.createElement('tr');
             if (task.isHidden) tr.classList.add('is-hidden-row');
             const dis = isLocked ? 'disabled' : '';
+
+            // Thêm các thuộc tính kéo thả (Drag & Drop)
+            if (canDrag) {
+                tr.setAttribute('draggable', 'true');
+                tr.setAttribute('data-id', task.id);
+                tr.ondragstart = handleDragStart;
+                tr.ondragover = handleDragOver;
+                tr.ondragenter = handleDragEnter;
+                tr.ondragleave = handleDragLeave;
+                tr.ondrop = handleDrop;
+                tr.ondragend = handleDragEnd;
+            }
 
             tr.innerHTML = `
                 <td class="col-stt"><strong>${index + 1}</strong></td>
@@ -412,13 +575,11 @@
             tableBody.appendChild(tr);
         });
         
-        initResizableColumns(); // Khởi tạo lại thanh kéo giãn sau khi render
+        initResizableColumns();
     }
 
-    // TÍNH NĂNG KÉO GIÃN CỘT BẰNG CHUỘT
     function initResizableColumns() {
         const cols = document.querySelectorAll('th');
-        // Xóa resizer cũ nếu có để tránh trùng lặp
         document.querySelectorAll('.resizer').forEach(el => el.remove());
         
         cols.forEach(col => {
@@ -434,7 +595,7 @@
                 document.addEventListener('mousemove', mouseMoveHandler);
                 document.addEventListener('mouseup', mouseUpHandler);
                 resizer.classList.add('resizing');
-                e.stopPropagation(); // Ngăn click nhầm vào sort
+                e.stopPropagation(); 
             };
             const mouseMoveHandler = function(e) {
                 const dx = e.clientX - x;
@@ -457,20 +618,25 @@
 
     function addNewTask() {
         if(isLocked) return;
-        tasksRef.push({ pillar: "", concept: "", link: "", ready: false, format: "", pic: "", deadline: "", isHidden: false });
+        const timestamp = Date.now();
+        tasksRef.push({ pillar: "", concept: "", link: "", ready: false, format: "", pic: "", deadline: "", isHidden: false, order: timestamp, createdAt: timestamp });
+        showToast("📝 Task mới đã được thêm! Hãy kéo xuống cuối danh sách để điền nhé.");
     }
 
     function toggleHideTask(id, currentStatus) {
         if(isLocked) return;
         db.ref('tasks/' + id).update({ isHidden: !currentStatus });
+        showToast(!currentStatus ? "👻 Đã ẩn task thành công!" : "♻️ Đã khôi phục task!");
     }
 
     function deleteTask(id) {
         if(isLocked) return;
-        if (confirm("Xóa vĩnh viễn task này? (Khuyên dùng nút Ẩn thay vì Xóa) 🥺")) db.ref('tasks/' + id).remove();
+        if (confirm("Xóa vĩnh viễn task này? (Khuyên dùng nút Ẩn thay vì Xóa) 🥺")) {
+            db.ref('tasks/' + id).remove();
+            showToast("🗑️ Đã xóa vĩnh viễn task!");
+        }
     }
 
-    // --- LOGIC QUẢN LÝ DANH MỤC (OPTIONS) ---
     function openOptionsManager() { document.getElementById('optionsModal').style.display = 'block'; renderOptionsManagerList(); }
     function closeOptionsManager() { document.getElementById('optionsModal').style.display = 'none'; }
     
@@ -494,12 +660,11 @@
         const newVal = document.getElementById(`opt_${cat}_${idx}`).value.trim();
         if(!newVal) return alert("Không được để trống!");
         const oldVal = globalOptions[cat][idx];
-        if(newVal === oldVal) return; // Không đổi gì
+        if(newVal === oldVal) return; 
 
         globalOptions[cat][idx] = newVal;
         optionsRef.update({ [cat]: globalOptions[cat] });
         
-        // Tự động đồng bộ tên mới cho các Task đang dùng tên cũ
         let updates = {};
         Object.keys(rawTasksData).forEach(taskId => {
             if(rawTasksData[taskId][cat] === oldVal) {
@@ -507,12 +672,14 @@
             }
         });
         if(Object.keys(updates).length > 0) db.ref().update(updates);
+        showToast("💾 Đã lưu thay đổi danh mục!");
     }
 
     function deleteOption(cat, idx) {
         if(confirm("Bạn có chắc muốn xóa option này? (Các task cũ vẫn sẽ giữ text nhưng hiển thị là Đã xóa)")) {
             globalOptions[cat].splice(idx, 1);
             optionsRef.update({ [cat]: globalOptions[cat] });
+            showToast("🗑️ Đã xóa option thành công!");
         }
     }
 
@@ -523,6 +690,7 @@
             if(!globalOptions[cat]) globalOptions[cat] = [];
             globalOptions[cat].push(newVal.trim());
             optionsRef.update({ [cat]: globalOptions[cat] });
+            showToast("➕ Đã thêm option mới!");
         }
     }
 
@@ -547,6 +715,7 @@
         document.body.setAttribute('data-theme', themeName);
         clearParticles();
         if(animActive) startAnimation(themeName);
+        showToast("🎨 Đã đổi giao diện thành công!");
     }
 
     function toggleAnimation() {
@@ -555,9 +724,11 @@
         if (animActive) {
             btn.innerHTML = "✨ Tắt Hiệu Ứng";
             startAnimation(document.getElementById('themeSelect').value);
+            showToast("✨ Đã bật hiệu ứng hạt rơi!");
         } else {
             btn.innerHTML = "✨ Bật Hiệu Ứng";
             clearParticles();
+            showToast("⏸️ Đã tắt hiệu ứng hạt rơi!");
         }
     }
 
