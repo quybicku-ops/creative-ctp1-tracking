@@ -23,7 +23,7 @@
             --th-color: #D81B60;
         }
 
-        /* 10 Themes Colors */
+        /* 20 Themes Colors */
         [data-theme="winter"] { --primary: #81d4fa; --bg: #e0f7fa; --text: #01579b; --container-bg: rgba(255,255,255,0.7); --th-bg: #b3e5fc; --th-color: #0277bd; }
         [data-theme="galaxy"] { --primary: #ce93d8; --bg: #0b1d3a; --text: #f3e5f5; --container-bg: rgba(20,20,50,0.8); --th-bg: #4a148c; --th-color: #ea80fc; --border: rgba(255,255,255,0.1); }
         [data-theme="forest"] { --primary: #aed581; --bg: #e8f5e9; --text: #1b5e20; --container-bg: rgba(255,255,255,0.8); --th-bg: #c8e6c9; --th-color: #2e7d32; }
@@ -33,6 +33,17 @@
         [data-theme="halloween"] { --primary: #ff9800; --bg: #3e2723; --text: #ffe0b2; --container-bg: rgba(0,0,0,0.6); --th-bg: #bf360c; --th-color: #ffb300; }
         [data-theme="valentine"] { --primary: #f48fb1; --bg: #fce4ec; --text: #880e4f; --container-bg: rgba(255,255,255,0.85); --th-bg: #f8bbd0; --th-color: #c2185b; }
         [data-theme="spring"] { --primary: #fff59d; --bg: #f1f8e9; --text: #33691e; --container-bg: rgba(255,255,255,0.85); --th-bg: #dcedc8; --th-color: #558b2f; }
+        /* 10 New Themes */
+        [data-theme="neon"] { --primary: #39ff14; --bg: #111; --text: #fff; --container-bg: rgba(20,20,20,0.85); --th-bg: #222; --th-color: #39ff14; --border: #39ff14; }
+        [data-theme="coffee"] { --primary: #8d6e63; --bg: #efebe9; --text: #3e2723; --container-bg: rgba(255,255,255,0.8); --th-bg: #d7ccc8; --th-color: #4e342e; }
+        [data-theme="desert"] { --primary: #e64a19; --bg: #fbe9e7; --text: #bf360c; --container-bg: rgba(255,255,255,0.85); --th-bg: #ffccbc; --th-color: #d84315; }
+        [data-theme="space"] { --primary: #b388ff; --bg: #000000; --text: #e8eaf6; --container-bg: rgba(15,15,30,0.8); --th-bg: #311b92; --th-color: #b388ff; --border: rgba(255,255,255,0.1); }
+        [data-theme="candy"] { --primary: #ff80ab; --bg: #f8bbd0; --text: #880e4f; --container-bg: rgba(255,255,255,0.85); --th-bg: #f48fb1; --th-color: #c2185b; }
+        [data-theme="gothic"] { --primary: #b71c1c; --bg: #212121; --text: #e0e0e0; --container-bg: rgba(40,40,40,0.8); --th-bg: #000; --th-color: #ef5350; --border: #424242; }
+        [data-theme="retro"] { --primary: #ffeb3b; --bg: #006064; --text: #fff; --container-bg: rgba(0,131,143,0.8); --th-bg: #004d40; --th-color: #ffeb3b; --border: #ffeb3b; }
+        [data-theme="magic"] { --primary: #ffd54f; --bg: #311b92; --text: #ede7f6; --container-bg: rgba(69,39,160,0.8); --th-bg: #512da8; --th-color: #ffe082; --border: #7e57c2; }
+        [data-theme="fruit"] { --primary: #ff5252; --bg: #e8f5e9; --text: #1b5e20; --container-bg: rgba(255,255,255,0.85); --th-bg: #c8e6c9; --th-color: #d32f2f; }
+        [data-theme="monochrome"] { --primary: #616161; --bg: #f5f5f5; --text: #212121; --container-bg: rgba(255,255,255,0.9); --th-bg: #e0e0e0; --th-color: #000; --border: #9e9e9e; }
 
         body {
             font-family: 'Nunito', sans-serif;
@@ -42,12 +53,10 @@
             padding: 20px;
             transition: background-color 0.5s ease, color 0.5s ease;
             overflow-x: hidden;
-            /* Tối ưu render font trên MacOS/Safari */
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
         }
 
-        /* Vùng chứa hạt Animation */
         #particles {
             position: fixed;
             top: 0; left: 0; width: 100vw; height: 100vh;
@@ -56,11 +65,7 @@
             overflow: hidden;
         }
 
-        .particle {
-            position: absolute;
-            animation: fall linear infinite;
-            opacity: 0.7;
-        }
+        .particle { position: absolute; animation: fall linear infinite; opacity: 0.7; }
 
         @keyframes fall {
             0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; }
@@ -76,169 +81,118 @@
             border-radius: 20px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.1);
             backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px); /* Cho Safari */
+            -webkit-backdrop-filter: blur(15px);
             border: 1px solid var(--border);
             transition: all 0.3s ease;
         }
 
-        /* Control Panel */
         .controls-panel {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            margin-bottom: 20px;
-            padding: 15px;
-            background: rgba(255, 255, 255, 0.3);
-            border-radius: 15px;
-            align-items: center;
+            display: flex; flex-wrap: wrap; gap: 15px; margin-bottom: 20px; padding: 15px;
+            background: rgba(255, 255, 255, 0.3); border-radius: 15px; align-items: center;
         }
 
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         h1 { margin: 0; color: var(--primary); font-size: 28px; }
+        .stats { background: rgba(255, 255, 255, 0.5); padding: 8px 15px; border-radius: 12px; font-weight: bold; }
 
-        .stats {
-            background: rgba(255, 255, 255, 0.5);
-            padding: 8px 15px;
-            border-radius: 12px;
-            font-weight: bold;
-        }
-
-        /* Nút bấm - Tối ưu cho Safari */
+        /* NÚT BẤM */
         .btn {
-            background: var(--primary);
-            color: #fff;
-            border: none;
-            padding: 10px 18px;
-            border-radius: 12px;
-            font-family: inherit;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-size: 15px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            color: var(--bg);
-            /* Ép Safari bỏ style mặc định của nút */
-            -webkit-appearance: none;
-            appearance: none;
+            background: var(--primary); color: var(--bg); border: none; padding: 10px 18px;
+            border-radius: 12px; font-family: inherit; font-weight: bold; cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); font-size: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1); -webkit-appearance: none; appearance: none;
         }
         
-        [data-theme="galaxy"] .btn, [data-theme="cyberpunk"] .btn, [data-theme="halloween"] .btn {
-            color: white;
-        }
+        [data-theme="galaxy"] .btn, [data-theme="cyberpunk"] .btn, [data-theme="halloween"] .btn, [data-theme="neon"] .btn, [data-theme="space"] .btn, [data-theme="gothic"] .btn { color: white; }
 
-        .btn:hover { transform: translateY(-2px); filter: brightness(1.1); }
-        .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-        
+        .btn:hover:not(:disabled) { 
+            transform: translateY(-3px) scale(1.02); 
+            box-shadow: 0 0 0 3px var(--container-bg), 0 0 0 6px var(--primary), 0 8px 20px rgba(0,0,0,0.15);
+            filter: brightness(1.05); 
+        }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
         .btn-small { padding: 5px 10px; font-size: 12px; margin: 2px; }
-        .btn-hide { background: #B0BEC5; }
+        .btn-hide { background: #B0BEC5; color: white; }
+        .btn-hide:hover:not(:disabled) { box-shadow: 0 0 0 3px var(--container-bg), 0 0 0 6px #B0BEC5, 0 8px 20px rgba(0,0,0,0.15); }
         .btn-delete { background: #EF5350; color: white; }
+        .btn-delete:hover:not(:disabled) { box-shadow: 0 0 0 3px var(--container-bg), 0 0 0 6px #EF5350, 0 8px 20px rgba(0,0,0,0.15); }
 
         select.theme-select {
-            padding: 10px 30px 10px 10px;
-            border-radius: 12px;
-            border: 1px solid var(--primary);
-            background: var(--container-bg);
-            color: var(--text);
-            font-weight: bold;
-            cursor: pointer;
-            /* Fix Safari Dropdown */
-            -webkit-appearance: none;
-            appearance: none;
+            padding: 10px 30px 10px 10px; border-radius: 12px; border: 1px solid var(--primary);
+            background: var(--container-bg); color: var(--text); font-weight: bold; cursor: pointer;
+            -webkit-appearance: none; appearance: none;
             background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-            background-repeat: no-repeat;
-            background-position: right 10px center;
-            background-size: 15px;
+            background-repeat: no-repeat; background-position: right 10px center; background-size: 15px; transition: all 0.3s;
         }
+        select.theme-select:hover { box-shadow: 0 0 0 2px var(--container-bg), 0 0 0 4px var(--primary); }
 
         /* Bảng & Resize Cột */
-        .table-wrapper {
-            overflow-x: auto;
-            border-radius: 15px;
-            border: 1px solid var(--border);
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        table { width: 100%; border-collapse: collapse; text-align: left; }
-
-        th, td { padding: 10px 12px; border-bottom: 1px solid var(--border); }
+        .table-wrapper { overflow-x: auto; border-radius: 15px; border: 1px solid var(--border); background: rgba(255, 255, 255, 0.1); }
+        table { width: 100%; border-collapse: collapse; text-align: left; table-layout: fixed; }
+        th, td { padding: 8px 10px; border-bottom: 1px solid var(--border); overflow: hidden; text-overflow: ellipsis; }
 
         th {
-            background-color: var(--th-bg);
-            color: var(--th-color);
-            font-weight: 800;
-            white-space: nowrap;
-            resize: horizontal;
-            overflow: auto;
-            cursor: pointer;
-            position: relative;
-            user-select: none;
+            background-color: var(--th-bg); color: var(--th-color); font-weight: 800; white-space: nowrap;
+            cursor: pointer; position: relative; user-select: none; transition: background 0.2s;
         }
-
         th:hover { filter: brightness(0.95); }
         
-        /* Icon sort */
+        /* Cột Resizer JS */
+        .resizer {
+            width: 5px; height: 100%; position: absolute; right: 0; top: 0;
+            cursor: col-resize; user-select: none; z-index: 10;
+        }
+        .resizer:hover, .resizing { background-color: var(--primary); opacity: 0.6; }
+
         .sort-icon { font-size: 12px; margin-left: 5px; opacity: 0.5; }
         .sort-icon.active { opacity: 1; }
 
         tr.is-hidden-row { opacity: 0.4; background-color: rgba(0,0,0,0.05); }
         tr:hover td { background-color: rgba(255, 255, 255, 0.2); }
 
-        /* Form Inputs - Fix Safari */
+        /* FORM INPUTS */
         input[type="text"], input[type="date"], select.data-input {
-            width: 100%;
-            border: 1px solid transparent;
-            background: rgba(255,255,255,0.4);
-            font-family: inherit;
-            color: var(--text);
-            border-radius: 8px;
-            transition: all 0.2s;
-            box-sizing: border-box;
-            /* Fix triệt để Safari */
-            -webkit-appearance: none;
-            appearance: none;
-            -webkit-box-shadow: none;
-            box-shadow: none;
+            width: 100%; border: 2px solid transparent; background: rgba(255,255,255,0.4);
+            font-family: inherit; color: var(--text); border-radius: 8px; transition: all 0.2s;
+            box-sizing: border-box; -webkit-appearance: none; appearance: none;
         }
-
-        input[type="text"], input[type="date"] {
-            padding: 8px;
-        }
-
-        /* Fix Select Box cho Safari */
+        input[type="text"], input[type="date"] { padding: 8px 10px; }
         select.data-input {
-            padding: 8px 25px 8px 8px; /* Chừa viền phải cho mũi tên */
+            padding: 8px 25px 8px 10px; 
             background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-            background-repeat: no-repeat;
-            background-position: right 8px center;
-            background-size: 14px;
+            background-repeat: no-repeat; background-position: right 8px center; background-size: 14px;
         }
-
+        input[type="text"]:hover:not(:disabled), select.data-input:hover:not(:disabled), input[type="date"]:hover:not(:disabled) {
+            background: rgba(255,255,255,0.8); border: 2px solid var(--primary); transform: scale(1.02);
+        }
         input[type="text"]:focus, select.data-input:focus, input[type="date"]:focus {
-            outline: none;
-            border: 1px solid var(--primary);
-            background: var(--container-bg);
+            outline: none; border: 2px solid var(--primary); background: var(--container-bg);
+            box-shadow: 0 0 0 2px var(--container-bg), 0 0 0 5px var(--primary); transform: scale(1.03); 
         }
-
         input:disabled, select:disabled { opacity: 0.7; cursor: not-allowed; }
 
-        /* Checkbox */
-        input[type="checkbox"] { 
-            width: 22px; 
-            height: 22px; 
-            accent-color: var(--primary); 
-            cursor: pointer;
-        }
+        input[type="checkbox"] { width: 20px; height: 20px; accent-color: var(--primary); cursor: pointer; transition: transform 0.2s; }
+        input[type="checkbox"]:hover:not(:disabled) { transform: scale(1.2); box-shadow: 0 0 10px var(--primary); }
 
         .col-stt { width: 60px; text-align: center; }
-        .col-action { min-width: 120px; text-align: center; }
-
+        .col-action { width: 140px; text-align: center; }
         #loader { text-align: center; padding: 50px; font-size: 18px; font-weight: bold; }
+
+        /* MODAL OPTIONS MANAGER */
+        .modal {
+            display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.5); backdrop-filter: blur(5px);
+        }
+        .modal-content {
+            background: var(--container-bg); color: var(--text); margin: 5% auto; padding: 30px;
+            border-radius: 20px; width: 90%; max-width: 500px; border: 2px solid var(--primary);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+        }
+        .close-modal { float: right; font-size: 28px; font-weight: bold; cursor: pointer; color: var(--text); }
+        .close-modal:hover { color: var(--primary); }
+        .opt-row { display: flex; gap: 10px; margin-bottom: 10px; }
+        .opt-row input { flex-grow: 1; border: 1px solid var(--border); }
+        .modal h2 { margin-top: 0; color: var(--primary); }
     </style>
 </head>
 <body data-theme="pastel">
@@ -255,6 +209,7 @@
         <button class="btn" onclick="addNewTask()" id="addBtn">➕ Thêm Task Mới</button>
         <button class="btn" id="lockBtn" onclick="toggleLock()">🔓 Đang Mở Edit</button>
         <button class="btn" id="showHiddenBtn" onclick="toggleShowHidden()">👁️ Đang Ẩn Task Đã Xóa</button>
+        <button class="btn" onclick="openOptionsManager()" style="background: var(--th-color);">⚙️ Quản lý Danh mục</button>
         
         <select class="theme-select" id="themeSelect" onchange="changeTheme(this.value)">
             <option value="pastel">🌸 Theme: Pastel (Mặc định)</option>
@@ -267,6 +222,16 @@
             <option value="halloween">🎃 Theme: Halloween</option>
             <option value="valentine">💖 Theme: Valentine</option>
             <option value="spring">🌷 Theme: Mùa Xuân</option>
+            <option value="neon">🚥 Theme: Neon City</option>
+            <option value="coffee">☕ Theme: Cà phê</option>
+            <option value="desert">🌵 Theme: Sa Mạc</option>
+            <option value="space">🚀 Theme: Vũ Trụ Đêm</option>
+            <option value="candy">🍬 Theme: Kẹo Ngọt</option>
+            <option value="gothic">🕸️ Theme: Gothic</option>
+            <option value="retro">📻 Theme: Retro 80s</option>
+            <option value="magic">🔮 Theme: Phép Thuật</option>
+            <option value="fruit">🍉 Theme: Trái Cây</option>
+            <option value="monochrome">⚪ Theme: Trắng Đen</option>
         </select>
         
         <button class="btn" id="animBtn" onclick="toggleAnimation()">✨ Tắt Hiệu Ứng</button>
@@ -294,86 +259,72 @@
     </div>
 </div>
 
+<div id="optionsModal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal" onclick="closeOptionsManager()">&times;</span>
+        <h2>⚙️ Quản lý Danh mục Option</h2>
+        <div style="margin-bottom: 15px;">
+            <label><strong>Chọn cột cần chỉnh sửa:</strong></label>
+            <select class="data-input" id="manageCategorySelect" onchange="renderOptionsManagerList()">
+                <option value="pillar">🏷️ Pillar/Type</option>
+                <option value="format">🎨 Format</option>
+                <option value="pic">🧑‍💻 PIC</option>
+            </select>
+        </div>
+        <div id="optionsListContainer" style="max-height: 300px; overflow-y: auto; padding-right: 10px;"></div>
+        <button class="btn" style="margin-top: 15px; width: 100%;" onclick="addOptionToManager()">➕ Thêm lựa chọn mới</button>
+    </div>
+</div>
+
 <script>
-    // 1. Cấu hình Firebase
-    const firebaseConfig = {
-        databaseURL: "https://creatives-ctp1-default-rtdb.firebaseio.com/"
-    };
+    const firebaseConfig = { databaseURL: "https://creatives-ctp1-default-rtdb.firebaseio.com/" };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
     
-    // Tham chiếu Data
     const tasksRef = db.ref('tasks');
     const optionsRef = db.ref('settings/options');
 
-    // States Toàn Cục
     let rawTasksData = {};
     let isLocked = false;
     let isShowingHidden = false;
-    let currentSort = { field: 'deadline', asc: true };
+    let currentSort = { field: null, asc: null }; // Khởi tạo không sort
     
-    // Tùy chọn mặc định cho Dropdown
     let globalOptions = {
         pillar: ["Research", "AI Gen", "Branding", "Design", "Social", "Production", "Animation", "Anime", "Khác"],
         format: ["Banner", "Video", "Image", "Chưa rõ"],
         pic: ["Bảo", "Lam", "Cả hai", "Chưa có"]
     };
 
-    // DOM Elements
     const tableBody = document.getElementById('taskTableBody');
     const loader = document.getElementById('loader');
     const tableContainer = document.getElementById('tableContainer');
     const statsDisplay = document.getElementById('statsDisplay');
 
-    // 2. Lấy tùy chọn Dropdown từ Firebase
     optionsRef.on('value', (snapshot) => {
-        if(snapshot.exists()) {
-            globalOptions = snapshot.val();
-        } else {
-            optionsRef.set(globalOptions);
-        }
+        if(snapshot.exists()) globalOptions = snapshot.val();
+        else optionsRef.set(globalOptions);
         renderTable();
+        if(document.getElementById('optionsModal').style.display === 'block') renderOptionsManagerList();
     });
 
-    // 3. Lắng nghe dữ liệu Task Realtime
     tasksRef.on('value', (snapshot) => {
         rawTasksData = snapshot.val() || {};
         renderTable();
     });
 
-    // Hàm tạo mã HTML cho các dropdown
     function getOptionsHtml(type, selectedValue) {
-        let html = globalOptions[type].map(opt => 
-            `<option value="${opt}" ${opt === selectedValue ? 'selected' : ''}>${opt}</option>`
-        ).join('');
-        html += `<option value="__add_new__">➕ Thêm mới...</option>`;
-        if (selectedValue && !globalOptions[type].includes(selectedValue) && selectedValue !== "__add_new__") {
-            html = `<option value="${selectedValue}" selected>${selectedValue}</option>` + html;
+        let html = globalOptions[type].map(opt => `<option value="${opt}" ${opt === selectedValue ? 'selected' : ''}>${opt}</option>`).join('');
+        if (selectedValue && !globalOptions[type].includes(selectedValue) && selectedValue !== "") {
+            html = `<option value="${selectedValue}" selected>${selectedValue} (Đã xóa)</option>` + html;
         }
         if (!selectedValue) html = `<option value="" selected>-- Chọn --</option>` + html;
         return html;
     }
 
-    // Hàm xử lý khi chọn Dropdown
     function handleSelectChange(id, field, selectElement) {
-        if (selectElement.value === "__add_new__") {
-            let newVal = prompt(`Nhập tùy chọn mới cho cột ${field}:`);
-            if (newVal && newVal.trim() !== "") {
-                newVal = newVal.trim();
-                if (!globalOptions[field].includes(newVal)) {
-                    globalOptions[field].push(newVal);
-                    optionsRef.update({ [field]: globalOptions[field] });
-                }
-                updateTask(id, field, newVal);
-            } else {
-                renderTable(); 
-            }
-        } else {
-            updateTask(id, field, selectElement.value);
-        }
+        updateTask(id, field, selectElement.value);
     }
 
-    // 4. Các tính năng Toggle
     function toggleLock() {
         isLocked = !isLocked;
         document.getElementById('lockBtn').innerHTML = isLocked ? "🔒 Đã Khóa Edit" : "🔓 Đang Mở Edit";
@@ -388,23 +339,27 @@
         renderTable();
     }
 
+    // TÍNH NĂNG TRI-STATE SORT
     function setSort(field) {
         if (currentSort.field === field) {
-            currentSort.asc = !currentSort.asc;
+            if(currentSort.asc === true) currentSort.asc = false; // Lần 2: Giảm dần
+            else { currentSort.field = null; currentSort.asc = null; } // Lần 3: Bỏ Sort
         } else {
             currentSort.field = field;
-            currentSort.asc = true;
+            currentSort.asc = true; // Lần 1: Tăng dần
         }
+        
         document.querySelectorAll('.sort-icon').forEach(el => { el.innerText = '↕'; el.classList.remove('active'); });
-        const activeIcon = document.getElementById('sort-' + field);
-        if(activeIcon) {
-            activeIcon.innerText = currentSort.asc ? '⬆' : '⬇';
-            activeIcon.classList.add('active');
+        if(currentSort.field) {
+            const activeIcon = document.getElementById('sort-' + field);
+            if(activeIcon) {
+                activeIcon.innerText = currentSort.asc ? '⬆' : '⬇';
+                activeIcon.classList.add('active');
+            }
         }
         renderTable();
     }
 
-    // 5. Render Bảng Chính
     function renderTable() {
         if (Object.keys(rawTasksData).length === 0 && !loader.style.display) return;
         
@@ -412,23 +367,22 @@
         tableContainer.style.display = 'block';
 
         let tasksArray = Object.entries(rawTasksData).map(([id, task]) => ({ id, ...task }));
-
-        if (!isShowingHidden) {
-            tasksArray = tasksArray.filter(t => !t.isHidden);
-        }
+        if (!isShowingHidden) tasksArray = tasksArray.filter(t => !t.isHidden);
 
         const total = tasksArray.length;
         const readyCount = tasksArray.filter(t => t.ready).length;
         statsDisplay.innerHTML = `Đã xong: ${readyCount} / ${total} 🚀`;
 
-        tasksArray.sort((a, b) => {
-            let valA = a[currentSort.field] || "";
-            let valB = b[currentSort.field] || "";
-            if (currentSort.field === 'ready') { valA = a.ready ? 1 : 0; valB = b.ready ? 1 : 0; }
-            if (valA < valB) return currentSort.asc ? -1 : 1;
-            if (valA > valB) return currentSort.asc ? 1 : -1;
-            return 0;
-        });
+        if(currentSort.field) {
+            tasksArray.sort((a, b) => {
+                let valA = a[currentSort.field] || "";
+                let valB = b[currentSort.field] || "";
+                if (currentSort.field === 'ready') { valA = a.ready ? 1 : 0; valB = b.ready ? 1 : 0; }
+                if (valA < valB) return currentSort.asc ? -1 : 1;
+                if (valA > valB) return currentSort.asc ? 1 : -1;
+                return 0;
+            });
+        }
 
         tableBody.innerHTML = '';
         if(tasksArray.length === 0) {
@@ -443,57 +397,59 @@
 
             tr.innerHTML = `
                 <td class="col-stt"><strong>${index + 1}</strong></td>
-                
-                <td>
-                    <select class="data-input" ${dis} onchange="handleSelectChange('${task.id}', 'pillar', this)">
-                        ${getOptionsHtml('pillar', task.pillar)}
-                    </select>
-                </td>
-
-                <td>
-                    <input type="text" ${dis} value="${task.concept || ''}" placeholder="Nhập concept..." 
-                           onblur="updateTask('${task.id}', 'concept', this.value)">
-                </td>
-
-                <td>
-                    <input type="text" ${dis} value="${task.link || ''}" placeholder="Link..." 
-                           onblur="updateTask('${task.id}', 'link', this.value)">
-                </td>
-
-                <td style="text-align: center;">
-                    <input type="checkbox" ${dis} ${task.ready ? 'checked' : ''} 
-                           onchange="updateTask('${task.id}', 'ready', this.checked)">
-                </td>
-
-                <td>
-                    <select class="data-input" ${dis} onchange="handleSelectChange('${task.id}', 'format', this)">
-                        ${getOptionsHtml('format', task.format)}
-                    </select>
-                </td>
-
-                <td>
-                    <select class="data-input" ${dis} onchange="handleSelectChange('${task.id}', 'pic', this)">
-                        ${getOptionsHtml('pic', task.pic)}
-                    </select>
-                </td>
-
-                <td>
-                    <input type="date" ${dis} value="${task.deadline || ''}" 
-                           onchange="updateTask('${task.id}', 'deadline', this.value)">
-                </td>
-
+                <td><select class="data-input" ${dis} onchange="handleSelectChange('${task.id}', 'pillar', this)">${getOptionsHtml('pillar', task.pillar)}</select></td>
+                <td><input type="text" ${dis} value="${task.concept || ''}" placeholder="Nhập concept..." onblur="updateTask('${task.id}', 'concept', this.value)"></td>
+                <td><input type="text" ${dis} value="${task.link || ''}" placeholder="Link..." onblur="updateTask('${task.id}', 'link', this.value)"></td>
+                <td style="text-align: center;"><input type="checkbox" ${dis} ${task.ready ? 'checked' : ''} onchange="updateTask('${task.id}', 'ready', this.checked)"></td>
+                <td><select class="data-input" ${dis} onchange="handleSelectChange('${task.id}', 'format', this)">${getOptionsHtml('format', task.format)}</select></td>
+                <td><select class="data-input" ${dis} onchange="handleSelectChange('${task.id}', 'pic', this)">${getOptionsHtml('pic', task.pic)}</select></td>
+                <td><input type="date" ${dis} value="${task.deadline || ''}" onchange="updateTask('${task.id}', 'deadline', this.value)"></td>
                 <td class="col-action">
-                    <button class="btn btn-small btn-hide" ${dis} onclick="toggleHideTask('${task.id}', ${task.isHidden})">
-                        ${task.isHidden ? 'Khôi phục' : 'Ẩn'}
-                    </button>
+                    <button class="btn btn-small btn-hide" ${dis} onclick="toggleHideTask('${task.id}', ${task.isHidden})">${task.isHidden ? 'Khôi phục' : 'Ẩn'}</button>
                     <button class="btn btn-small btn-delete" ${dis} onclick="deleteTask('${task.id}')">Xóa</button>
                 </td>
             `;
             tableBody.appendChild(tr);
         });
+        
+        initResizableColumns(); // Khởi tạo lại thanh kéo giãn sau khi render
     }
 
-    // 6. DB Operations
+    // TÍNH NĂNG KÉO GIÃN CỘT BẰNG CHUỘT
+    function initResizableColumns() {
+        const cols = document.querySelectorAll('th');
+        // Xóa resizer cũ nếu có để tránh trùng lặp
+        document.querySelectorAll('.resizer').forEach(el => el.remove());
+        
+        cols.forEach(col => {
+            const resizer = document.createElement('div');
+            resizer.classList.add('resizer');
+            col.appendChild(resizer);
+            
+            let x = 0, w = 0;
+            const mouseDownHandler = function(e) {
+                x = e.clientX;
+                const styles = window.getComputedStyle(col);
+                w = parseInt(styles.width, 10);
+                document.addEventListener('mousemove', mouseMoveHandler);
+                document.addEventListener('mouseup', mouseUpHandler);
+                resizer.classList.add('resizing');
+                e.stopPropagation(); // Ngăn click nhầm vào sort
+            };
+            const mouseMoveHandler = function(e) {
+                const dx = e.clientX - x;
+                col.style.width = `${w + dx}px`;
+            };
+            const mouseUpHandler = function() {
+                document.removeEventListener('mousemove', mouseMoveHandler);
+                document.removeEventListener('mouseup', mouseUpHandler);
+                resizer.classList.remove('resizing');
+            };
+            resizer.addEventListener('mousedown', mouseDownHandler);
+            resizer.addEventListener('click', e => e.stopPropagation());
+        });
+    }
+
     function updateTask(id, field, value) {
         if(isLocked) return;
         db.ref('tasks/' + id).update({ [field]: value });
@@ -501,10 +457,7 @@
 
     function addNewTask() {
         if(isLocked) return;
-        tasksRef.push({
-            pillar: "Khác", concept: "", link: "", ready: false,
-            format: "Chưa rõ", pic: "", deadline: "", isHidden: false
-        });
+        tasksRef.push({ pillar: "", concept: "", link: "", ready: false, format: "", pic: "", deadline: "", isHidden: false });
     }
 
     function toggleHideTask(id, currentStatus) {
@@ -514,26 +467,80 @@
 
     function deleteTask(id) {
         if(isLocked) return;
-        if (confirm("Xóa vĩnh viễn task này? (Khuyên dùng nút Ẩn thay vì Xóa) 🥺")) {
-            db.ref('tasks/' + id).remove();
+        if (confirm("Xóa vĩnh viễn task này? (Khuyên dùng nút Ẩn thay vì Xóa) 🥺")) db.ref('tasks/' + id).remove();
+    }
+
+    // --- LOGIC QUẢN LÝ DANH MỤC (OPTIONS) ---
+    function openOptionsManager() { document.getElementById('optionsModal').style.display = 'block'; renderOptionsManagerList(); }
+    function closeOptionsManager() { document.getElementById('optionsModal').style.display = 'none'; }
+    
+    function renderOptionsManagerList() {
+        const cat = document.getElementById('manageCategorySelect').value;
+        const container = document.getElementById('optionsListContainer');
+        container.innerHTML = '';
+        if(!globalOptions[cat]) globalOptions[cat] = [];
+        
+        globalOptions[cat].forEach((opt, idx) => {
+            container.innerHTML += `
+                <div class="opt-row">
+                    <input type="text" value="${opt}" id="opt_${cat}_${idx}">
+                    <button class="btn btn-small" style="background:var(--accent); color:#000;" onclick="saveOption('${cat}', ${idx})">💾 Lưu</button>
+                    <button class="btn btn-small btn-delete" onclick="deleteOption('${cat}', ${idx})">❌</button>
+                </div>`;
+        });
+    }
+
+    function saveOption(cat, idx) {
+        const newVal = document.getElementById(`opt_${cat}_${idx}`).value.trim();
+        if(!newVal) return alert("Không được để trống!");
+        const oldVal = globalOptions[cat][idx];
+        if(newVal === oldVal) return; // Không đổi gì
+
+        globalOptions[cat][idx] = newVal;
+        optionsRef.update({ [cat]: globalOptions[cat] });
+        
+        // Tự động đồng bộ tên mới cho các Task đang dùng tên cũ
+        let updates = {};
+        Object.keys(rawTasksData).forEach(taskId => {
+            if(rawTasksData[taskId][cat] === oldVal) {
+                updates[`tasks/${taskId}/${cat}`] = newVal;
+            }
+        });
+        if(Object.keys(updates).length > 0) db.ref().update(updates);
+    }
+
+    function deleteOption(cat, idx) {
+        if(confirm("Bạn có chắc muốn xóa option này? (Các task cũ vẫn sẽ giữ text nhưng hiển thị là Đã xóa)")) {
+            globalOptions[cat].splice(idx, 1);
+            optionsRef.update({ [cat]: globalOptions[cat] });
         }
     }
 
-    // 7. THEMES & ANIMATIONS
+    function addOptionToManager() {
+        const cat = document.getElementById('manageCategorySelect').value;
+        const newVal = prompt("Nhập tên option mới:");
+        if(newVal && newVal.trim() !== "") {
+            if(!globalOptions[cat]) globalOptions[cat] = [];
+            globalOptions[cat].push(newVal.trim());
+            optionsRef.update({ [cat]: globalOptions[cat] });
+        }
+    }
+
+    // --- TÍNH NĂNG THEMES & ANIMATIONS ---
     let animActive = true;
     let particleInterval;
     
     const themeConfig = {
-        pastel: { emoji: '🌸', speed: 2, size: 20 },
-        winter: { emoji: '❄️', speed: 3, size: 15 },
-        galaxy: { emoji: '✨', speed: 1.5, size: 25 },
-        forest: { emoji: '🍃', speed: 2.5, size: 18 },
-        sunset: { emoji: '☁️', speed: 1, size: 40 },
-        ocean: { emoji: '🫧', speed: 2, size: 20 },
-        cyberpunk: { emoji: '👾', speed: 4, size: 20 },
-        halloween: { emoji: '🦇', speed: 3, size: 25 },
-        valentine: { emoji: '💖', speed: 2, size: 20 },
-        spring: { emoji: '🌷', speed: 2, size: 22 }
+        pastel: { emoji: '🌸', speed: 2, size: 20 }, winter: { emoji: '❄️', speed: 3, size: 15 },
+        galaxy: { emoji: '✨', speed: 1.5, size: 25 }, forest: { emoji: '🍃', speed: 2.5, size: 18 },
+        sunset: { emoji: '☁️', speed: 1, size: 40 }, ocean: { emoji: '🫧', speed: 2, size: 20 },
+        cyberpunk: { emoji: '👾', speed: 4, size: 20 }, halloween: { emoji: '🦇', speed: 3, size: 25 },
+        valentine: { emoji: '💖', speed: 2, size: 20 }, spring: { emoji: '🌷', speed: 2, size: 22 },
+        neon: { emoji: '🚥', speed: 1.5, size: 20 }, coffee: { emoji: '☕', speed: 3, size: 22 },
+        desert: { emoji: '🌵', speed: 2.5, size: 25 }, space: { emoji: '🚀', speed: 1, size: 30 },
+        candy: { emoji: '🍬', speed: 2.2, size: 20 }, gothic: { emoji: '🕸️', speed: 3, size: 25 },
+        retro: { emoji: '📻', speed: 2, size: 28 }, magic: { emoji: '🔮', speed: 1.8, size: 24 },
+        fruit: { emoji: '🍉', speed: 2.5, size: 22 }, monochrome: { emoji: '⚪', speed: 3, size: 15 }
     };
 
     function changeTheme(themeName) {
@@ -547,18 +554,14 @@
         const btn = document.getElementById('animBtn');
         if (animActive) {
             btn.innerHTML = "✨ Tắt Hiệu Ứng";
-            const currentTheme = document.getElementById('themeSelect').value;
-            startAnimation(currentTheme);
+            startAnimation(document.getElementById('themeSelect').value);
         } else {
             btn.innerHTML = "✨ Bật Hiệu Ứng";
             clearParticles();
         }
     }
 
-    function clearParticles() {
-        clearInterval(particleInterval);
-        document.getElementById('particles').innerHTML = '';
-    }
+    function clearParticles() { clearInterval(particleInterval); document.getElementById('particles').innerHTML = ''; }
 
     function startAnimation(themeName) {
         clearParticles();
@@ -579,12 +582,11 @@
             p.style.animationDuration = duration + 's';
 
             document.getElementById('particles').appendChild(p);
-            setTimeout(() => { p.remove(); }, duration * 1000);
+            setTimeout(() => p.remove(), duration * 1000);
         }, 300);
     }
 
     startAnimation('pastel');
-
 </script>
 </body>
 </html>
