@@ -232,6 +232,30 @@
             transform: translateX(0);
             opacity: 1;
         }
+
+        /* MESSAGES STYLE */
+        .messages-wrapper {
+            margin-top: 25px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 15px;
+            border: 1px solid var(--border);
+        }
+        .message-item {
+            background: var(--container-bg);
+            padding: 10px 15px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 4px solid var(--primary);
+            margin-bottom: 8px;
+        }
+        .message-content { display: flex; flex-direction: column; flex-grow: 1; }
+        .message-sender { font-weight: 800; font-size: 14px; color: var(--primary); margin-bottom: 3px; }
+        .message-text { font-size: 15px; word-break: break-word; }
+        .message-time { font-size: 11px; opacity: 0.6; font-weight: normal; margin-left: 5px; }
+        
     </style>
 </head>
 <body data-theme="pastel">
@@ -297,6 +321,20 @@
             <tbody id="taskTableBody"></tbody>
         </table>
     </div>
+
+    <div class="messages-wrapper" id="messagesWrapper" style="display: none;">
+        <h2 style="color: var(--primary); margin-top: 0; font-size: 20px;">💬 Bảng Tin nhắn</h2>
+        
+        <div id="messagesList" style="max-height: 250px; overflow-y: auto; margin-bottom: 15px; padding-right: 5px;">
+            </div>
+        
+        <div style="display: flex; gap: 10px; align-items: center;">
+            <select class="data-input" id="msgSenderSelect" style="width: 150px;">
+                </select>
+            <input type="text" id="msgTextInput" placeholder="Nhập tin nhắn để lại..." style="flex-grow: 1;" onkeypress="if(event.key === 'Enter') addMessage()">
+            <button class="btn" onclick="addMessage()">Gửi</button>
+        </div>
+    </div>
 </div>
 
 <div id="optionsModal" class="modal">
@@ -309,6 +347,7 @@
                 <option value="pillar">🏷️ Pillar/Type</option>
                 <option value="format">🎨 Format</option>
                 <option value="pic">🧑‍💻 PIC</option>
+                <option value="msgSender">👤 Người gửi Message</option>
             </select>
         </div>
         <div id="optionsListContainer" style="max-height: 300px; overflow-y: auto; padding-right: 10px;"></div>
@@ -323,8 +362,10 @@
     
     const tasksRef = db.ref('tasks');
     const optionsRef = db.ref('settings/options');
+    const messagesRef = db.ref('messages'); // Ref cho bảng tin nhắn
 
     let rawTasksData = {};
+    let rawMessagesData = {};
     let isLocked = false;
     let isShowingHidden = false;
     let currentSort = { field: null, asc: null }; 
@@ -333,13 +374,15 @@
     let globalOptions = {
         pillar: ["Research", "AI Gen", "Branding", "Design", "Social", "Production", "Animation", "Anime", "Khác"],
         format: ["Banner", "Video", "Image", "Chưa rõ"],
-        pic: ["Bảo", "Lam", "Cả hai", "Chưa có"]
+        pic: ["Bảo", "Lam", "Cả hai", "Chưa có"],
+        msgSender: ["Bảo", "Lam"] // Default người gửi tin nhắn
     };
 
     const tableBody = document.getElementById('taskTableBody');
     const loader = document.getElementById('loader');
     const tableContainer = document.getElementById('tableContainer');
     const statsDisplay = document.getElementById('statsDisplay');
+    const messagesWrapper = document.getElementById('messagesWrapper');
 
     // --- HỆ THỐNG TOAST NOTIFICATION ---
     function showToast(message) {
@@ -359,16 +402,35 @@
         }, 4000);
     }
 
+    // --- TẢI OPTIONS TỪ FIREBASE ---
     optionsRef.on('value', (snapshot) => {
-        if(snapshot.exists()) globalOptions = snapshot.val();
-        else optionsRef.set(globalOptions);
+        if(snapshot.exists()) {
+            globalOptions = snapshot.val();
+            // Đảm bảo msgSender tồn tại cho các DB cũ
+            let needUpdate = false;
+            if(!globalOptions.msgSender) {
+                globalOptions.msgSender = ["Bảo", "Lam"];
+                needUpdate = true;
+            }
+            if(needUpdate) optionsRef.set(globalOptions);
+        } else {
+            optionsRef.set(globalOptions);
+        }
+        
         renderTable();
+        renderMessageSenderOptions();
         if(document.getElementById('optionsModal').style.display === 'block') renderOptionsManagerList();
     });
 
     tasksRef.on('value', (snapshot) => {
         rawTasksData = snapshot.val() || {};
         renderTable();
+    });
+
+    // --- LẮNG NGHE TIN NHẮN TỪ FIREBASE ---
+    messagesRef.on('value', (snapshot) => {
+        rawMessagesData = snapshot.val() || {};
+        renderMessages();
     });
 
     function getOptionsHtml(type, selectedValue) {
@@ -379,6 +441,74 @@
         if (!selectedValue) html = `<option value="" selected>-- Chọn --</option>` + html;
         return html;
     }
+
+    // --- RENDER DROPDOWN MESSAGE ---
+    function renderMessageSenderOptions() {
+        const select = document.getElementById('msgSenderSelect');
+        if (select) {
+            let html = globalOptions.msgSender.map(opt => `<option value="${opt}">${opt}</option>`).join('');
+            select.innerHTML = `<option value="" disabled selected>-- Ai đang nhắn? --</option>` + html;
+        }
+    }
+
+    // --- XỬ LÝ MESSAGE ---
+    function renderMessages() {
+        messagesWrapper.style.display = 'block'; // Hiển thị khung khi đã tải
+        const list = document.getElementById('messagesList');
+        list.innerHTML = '';
+        
+        let msgs = Object.entries(rawMessagesData).map(([id, msg]) => ({ id, ...msg }));
+        msgs.sort((a, b) => a.timestamp - b.timestamp); // Xếp tin nhắn cũ trên, mới dưới
+        
+        if(msgs.length === 0) {
+            list.innerHTML = `<div style="text-align:center; opacity:0.6; padding: 10px;">Chưa có lời nhắn nào. Hãy là người đầu tiên! 💬</div>`;
+            return;
+        }
+
+        msgs.forEach(msg => {
+            const div = document.createElement('div');
+            div.className = 'message-item';
+            const timeString = new Date(msg.timestamp).toLocaleString('vi-VN');
+            
+            div.innerHTML = `
+                <div class="message-content">
+                    <span class="message-sender">${msg.sender} <span class="message-time">(${timeString})</span></span>
+                    <span class="message-text">${msg.text}</span>
+                </div>
+                <button class="btn btn-small btn-delete" onclick="deleteMessage('${msg.id}')">Xóa</button>
+            `;
+            list.appendChild(div);
+        });
+        
+        // Auto scroll xuống dưới cùng khi có tin nhắn mới
+        list.scrollTop = list.scrollHeight;
+    }
+
+    function addMessage() {
+        const sender = document.getElementById('msgSenderSelect').value;
+        const textInput = document.getElementById('msgTextInput');
+        const text = textInput.value.trim();
+        
+        if (!sender) return showToast("⚠️ Vui lòng chọn người đang nhắn ở dropdown!");
+        if (!text) return showToast("⚠️ Không thể gửi tin nhắn trống!");
+        
+        messagesRef.push({
+            sender: sender,
+            text: text,
+            timestamp: Date.now()
+        });
+        
+        textInput.value = '';
+        showToast("💬 Đã để lại lời nhắn thành công!");
+    }
+
+    function deleteMessage(id) {
+        if (confirm("Bạn có chắc chắn muốn xóa tin nhắn này không?")) {
+            db.ref('messages/' + id).remove();
+            showToast("🗑️ Đã xóa tin nhắn!");
+        }
+    }
+
 
     function handleSelectChange(id, field, selectElement) {
         updateTask(id, field, selectElement.value);
@@ -665,18 +795,26 @@
         globalOptions[cat][idx] = newVal;
         optionsRef.update({ [cat]: globalOptions[cat] });
         
-        let updates = {};
-        Object.keys(rawTasksData).forEach(taskId => {
-            if(rawTasksData[taskId][cat] === oldVal) {
-                updates[`tasks/${taskId}/${cat}`] = newVal;
-            }
-        });
-        if(Object.keys(updates).length > 0) db.ref().update(updates);
+        // Nếu thay đổi các Options liên quan đến Task, thì update cho các Tasks cũ
+        if (cat !== 'msgSender') {
+            let updates = {};
+            Object.keys(rawTasksData).forEach(taskId => {
+                if(rawTasksData[taskId][cat] === oldVal) {
+                    updates[`tasks/${taskId}/${cat}`] = newVal;
+                }
+            });
+            if(Object.keys(updates).length > 0) db.ref().update(updates);
+        }
+        
         showToast("💾 Đã lưu thay đổi danh mục!");
     }
 
     function deleteOption(cat, idx) {
-        if(confirm("Bạn có chắc muốn xóa option này? (Các task cũ vẫn sẽ giữ text nhưng hiển thị là Đã xóa)")) {
+        let confirmText = cat === 'msgSender' 
+            ? "Bạn có chắc muốn xóa người gửi này khỏi danh sách?" 
+            : "Bạn có chắc muốn xóa option này? (Các task cũ vẫn sẽ giữ text nhưng hiển thị là Đã xóa)";
+            
+        if(confirm(confirmText)) {
             globalOptions[cat].splice(idx, 1);
             optionsRef.update({ [cat]: globalOptions[cat] });
             showToast("🗑️ Đã xóa option thành công!");
